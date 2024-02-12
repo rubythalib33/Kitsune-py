@@ -1,0 +1,6 @@
+build
+.vscode
+venv
+Active_Wiretap_pcap.pcapng
+*.pcap
+__pycache__
