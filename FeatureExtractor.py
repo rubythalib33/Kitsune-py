@@ -120,19 +120,23 @@ class FE:
                     src_port = udp.sport
                     dst_port = udp.dport
                 # print(src_port, dst_port)
-            if src_ip + str(src_port) + dst_ip + str(dst_port) == '':
+            if str(src_port) == '': # it's a L2/L1 level protocol
                 # Check for ARP or ICMP as examples of L2/L1 protocols
                 if isinstance(eth.data, dpkt.arp.ARP):
                     arp = eth.data
                     src_ip = socket.inet_ntoa(arp.spa)
                     dst_ip = socket.inet_ntoa(arp.tpa)
-                    ip_proto = 'arp'
+                    src_port = 'arp'
+                    dst_port = 'arp'
+                    ip_proto = 0
                 elif isinstance(eth.data, dpkt.icmp.ICMP):
                     icmp = eth.data
-                    ip_proto = 'icmp'
-                # Use MAC addresses as IPs for other L2/L1 protocols
-                src_ip = src_mac
-                dst_ip = dst_mac
+                    src_port = 'icmp'
+                    dst_port = 'icmp'
+                    ip_proto = 0
+                elif src_ip + str(src_port) + dst_ip + str(dst_port) == '':
+                    src_ip = src_mac
+                    dst_ip = dst_mac
             # print(header.getts()[0])
             # print(len(data))
             #
