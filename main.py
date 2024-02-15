@@ -31,7 +31,8 @@ FMgrace = 5000 #the number of instances taken to learn the feature mapping (the 
 ADgrace = 50000 #the number of instances used to train the anomaly detector (ensemble itself)
 
 # Build Kitsune
-K = Kitsune(path,packet_limit,maxAE,FMgrace,ADgrace)
+# K = Kitsune(file_path=path,limit=packet_limit,max_autoencoder_size=maxAE,FM_grace_period=FMgrace,AD_grace_period=ADgrace)
+K=Kitsune(interface='wlo1', type='tshark', limit=packet_limit,max_autoencoder_size=maxAE,FM_grace_period=FMgrace,AD_grace_period=ADgrace)
 
 print("Running Kitsune:")
 RMSEs = []
