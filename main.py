@@ -4,9 +4,9 @@ import numpy as np
 import time
 
 # Connect to MongoDB
-client = MongoClient('mongodb://localhost:27017/')
-db = client['kitsune']  # Change 'your_database_name' to your MongoDB database name
-collection = db['network_rmse_1']
+# client = MongoClient('mongodb://localhost:27017/')
+# db = client['kitsune']  # Change 'your_database_name' to your MongoDB database name
+# collection = db['network_rmse_1']
 
 # Load Mirai pcap (a recording of the Mirai botnet malware being activated)
 # The first 70,000 observations are clean...
@@ -16,7 +16,7 @@ with zipfile.ZipFile("mirai.zip", "r") as zip_ref:
     zip_ref.extractall()
 
 # File location
-path = "mirai.pcap"  # the pcap, pcapng, or tsv file to process.
+path = "Active_Wiretap_pcap.pcapng"  # the pcap, pcapng, or tsv file to process.
 packet_limit = 200_000  # the number of packets to process
 
 # KitNET params:
@@ -43,7 +43,7 @@ while True:
         break
     RMSEs.append(rmse)
     # Push data to MongoDB
-    collection.insert_one({"timestamp": time.time(), "rmse": rmse})
+    # collection.insert_one({"timestamp": time.time(), "rmse": rmse})
 stop = time.time()
 print("Complete. Time elapsed: " + str(stop - start))
 
@@ -53,15 +53,15 @@ benignSample = np.log(RMSEs[FMgrace + ADgrace + 1:100000])
 logProbs = norm.logsf(np.log(RMSEs), np.mean(benignSample), np.std(benignSample))
 
 # plot the RMSE anomaly scores
-# print("Plotting results")
-# from matplotlib import pyplot as plt
-# from matplotlib import cm
-# plt.figure(figsize=(10,5))
-# fig = plt.scatter(range(FMgrace+ADgrace+1,len(RMSEs)),RMSEs[FMgrace+ADgrace+1:],s=0.1,c=logProbs[FMgrace+ADgrace+1:],cmap='RdYlGn')
-# plt.yscale("log")
-# plt.title("Anomaly Scores from Kitsune's Execution Phase")
-# plt.ylabel("RMSE (log scaled)")
-# plt.xlabel("Time elapsed [min]")
-# figbar=plt.colorbar()
-# figbar.ax.set_ylabel('Log Probability\n ', rotation=270)
-# plt.show()
+print("Plotting results")
+from matplotlib import pyplot as plt
+from matplotlib import cm
+plt.figure(figsize=(10,5))
+fig = plt.scatter(range(FMgrace+ADgrace+1,len(RMSEs)),RMSEs[FMgrace+ADgrace+1:],s=0.1,c=logProbs[FMgrace+ADgrace+1:],cmap='RdYlGn')
+plt.yscale("log")
+plt.title("Anomaly Scores from Kitsune's Execution Phase")
+plt.ylabel("RMSE (log scaled)")
+plt.xlabel("Time elapsed [min]")
+figbar=plt.colorbar()
+figbar.ax.set_ylabel('Log Probability\n ', rotation=270)
+plt.show()

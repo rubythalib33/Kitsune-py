@@ -7,3 +7,5 @@ print(feature_extractor.get_next_vector())
 print(feature_extractor.get_next_vector())
 
 print(feature_extractor.get_next_vector())
+
+print(feature_extractor.get_next_vector().shape)
