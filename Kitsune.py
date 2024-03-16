@@ -33,10 +33,12 @@ class Kitsune:
 
     def proc_next_packet(self):
         # create feature vector
-        x = self.FE.get_next_vector()
+        x, data = self.FE.get_next_vector()
         if len(x) == 0:
             return -1 #Error or no packets left
-
+        
+        rmse = self.AnomDetector.process(x)
+        data['rmse'] = rmse
         # process KitNET
-        return self.AnomDetector.process(x)  # will train during the grace periods, then execute on all the rest.
+        return data  # will train during the grace periods, then execute on all the rest.
 

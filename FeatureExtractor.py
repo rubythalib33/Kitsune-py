@@ -149,7 +149,18 @@ class FE:
                 # print(len(data))
                 #
                 # Update and get stats
-                return self.nstat.updateGetStats(str(ip_proto), src_mac, dst_mac, src_ip, str(src_port), dst_ip, str(dst_port), len(data), float(header.getts()[0]))
+                data_dict = {
+                    "ip_protocol": str(ip_proto),
+                    "source_mac": src_mac,
+                    "destination_mac": dst_mac,
+                    "source_ip": src_ip,
+                    "source_port": str(src_port),
+                    "destination_ip": dst_ip,
+                    "destination_port": str(dst_port),
+                    "data_length": len(data),
+                    "timestamp": header.getts()[0]
+                }
+                return self.nstat.updateGetStats(str(ip_proto), src_mac, dst_mac, src_ip, str(src_port), dst_ip, str(dst_port), len(data), float(header.getts()[0])), data_dict
             elif self.type == 'tshark':
                 packet = next(self.sniff, None)
                 if packet is None:
@@ -205,7 +216,19 @@ class FE:
 
                 # Update and get stats
                 self.curPacketIndx += 1
-                return self.nstat.updateGetStats(ip_proto, src_mac, dst_mac, src_ip, src_port, dst_ip, dst_port, packet_length, float(timestamp))
+                data_dict = {
+                    "ip_protocol": str(ip_proto),
+                    "source_mac": src_mac,
+                    "destination_mac": dst_mac,
+                    "source_ip": src_ip,
+                    "source_port": str(src_port),
+                    "destination_ip": dst_ip,
+                    "destination_port": str(dst_port),
+                    "data_length": packet_length,
+                    "timestamp": timestamp
+                }
+
+                return self.nstat.updateGetStats(ip_proto, src_mac, dst_mac, src_ip, src_port, dst_ip, dst_port, packet_length, float(timestamp)), data_dict
         except Exception as e:
             print(e)
             traceback.print_exc()
