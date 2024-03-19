@@ -32,7 +32,7 @@ def is_root():
 # If wireshark is used then a tsv file (parsed version of the pcap) will be made -which you can use as your input next time
 class FE:
     def __init__(self,file_path=None, interface=None,limit=np.inf, type='pcap'):
-        assert type in ['pcap', 'tshark'], "type should be pcap or tshark"
+        assert type in ['pcap', 'tshark', 'csv'], "type should be pcap or tshark or csv"
         if type == 'pcap':
             assert file_path!=None
         elif type == 'tshark':
@@ -266,6 +266,8 @@ class FE:
         print("tshark parsing complete. File saved as: "+self.path +".tsv")
 
     def get_num_features(self):
+        if self.type == 'csv':
+            return len(self.df.iloc[0])
         return len(self.nstat.getNetStatHeaders())
     
     def close(self):

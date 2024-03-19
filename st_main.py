@@ -9,10 +9,13 @@ from math import ceil
 import pandas as pd
 from datetime import datetime
 
+SAVE_DATA = False
+
 st.set_page_config(layout="wide")
-client = MongoClient('mongodb://localhost:27017/')
-db = client['kitsune']  # Change 'your_database_name' to your MongoDB database name
-collection = db['network_rmse_2']
+if SAVE_DATA:
+    client = MongoClient('mongodb://localhost:27017/')
+    db = client['kitsune']  # Change 'your_database_name' to your MongoDB database name
+    collection = db['network_rmse_2']
 
 menu = st.sidebar.selectbox("Menu", ['Kitsune Engine', 'Logs'])
 
@@ -51,6 +54,9 @@ if menu == "Kitsune Engine":
         if path.endswith('pcap') or path.endswith('pcapng'):
             K = Kitsune(file_path=path, limit=packet_limit, max_autoencoder_size=maxAE, FM_grace_period=FMgrace,
                         AD_grace_period=ADgrace)
+        elif path.endswith('csv'):
+            K = Kitsune(file_path=path, limit=packet_limit, max_autoencoder_size=maxAE, FM_grace_period=FMgrace,
+                        AD_grace_period=ADgrace, type='csv')
         else:
             K = Kitsune(interface=path, limit=packet_limit, max_autoencoder_size=maxAE, FM_grace_period=FMgrace,
                         AD_grace_period=ADgrace,type='tshark')
@@ -67,7 +73,8 @@ if menu == "Kitsune Engine":
             if i % 1000 == 0:
                 print(i)
                 if i > FMgrace+ADgrace:
-                    benignSample = np.log(RMSEs[FMgrace + ADgrace + 1:100000])
+                    print(RMSEs[i-2])
+                    benignSample = np.log(RMSEs[FMgrace + ADgrace + 1:FMgrace + ADgrace +100000])
                     logProbs = norm.logsf(np.log(RMSEs), np.mean(benignSample), np.std(benignSample))
                     fig = plot(FMgrace, ADgrace, RMSEs, logProbs)
                     graph_placeholder.pyplot(fig)
@@ -79,13 +86,14 @@ if menu == "Kitsune Engine":
             if rmse == -1 or i > K.limit:
                 break
             data['path'] = path
-            # result = collection.insert_one(data)
+            if SAVE_DATA:
+                result = collection.insert_one(data)
             RMSEs.append(rmse)
         stop = time.time()
         print("Complete. Time elapsed: " + str(stop - start))
 
         # Here we demonstrate how one can fit the RMSE scores to a log-normal distribution (useful for finding/setting a cutoff threshold \phi)
-        benignSample = np.log(RMSEs[FMgrace + ADgrace + 1:100000])
+        benignSample = np.log(RMSEs[FMgrace + ADgrace + 1:FMgrace + ADgrace +100000])
         logProbs = norm.logsf(np.log(RMSEs), np.mean(benignSample), np.std(benignSample))
         fig = plot(FMgrace, ADgrace, RMSEs, logProbs)
         graph_placeholder.pyplot(fig)
