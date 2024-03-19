@@ -1,5 +1,6 @@
 from FeatureExtractor import *
 from KitNET.KitNET import KitNET
+import pandas as pd
 
 # MIT License
 #
@@ -26,6 +27,7 @@ from KitNET.KitNET import KitNET
 class Kitsune:
     def __init__(self,limit,file_path=None, interface=None,max_autoencoder_size=10,FM_grace_period=None,AD_grace_period=10000,learning_rate=0.1,hidden_ratio=0.75,type='pcap'):
         #init packet feature extractor (AfterImage)
+        self.type = type
         self.FE = FE(file_path=file_path,limit=limit, interface=interface, type=type)
         self.limit = self.FE.limit
         #init Kitnet

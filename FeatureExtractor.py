@@ -1,7 +1,7 @@
 #Check if cython code has been compiled
 import os
 import subprocess
-
+import time
 use_extrapolation=False #experimental correlation code
 if use_extrapolation:
     print("Importing AfterImage Cython Library")
@@ -22,6 +22,7 @@ import traceback
 import socket
 import os
 import pyshark
+import pandas as pd
 
 def is_root():
     return os.geteuid() == 0
@@ -37,6 +38,8 @@ class FE:
         elif type == 'tshark':
             assert interface!=None
             assert is_root()
+        elif type == 'csv':
+            assert file_path!=None
         self.type = type
         self.interface = interface
         self.path = file_path
@@ -83,6 +86,10 @@ class FE:
             else:
                 print("File: " + self.path + " is not a pcap file")
                 raise Exception()
+        elif self.type == 'csv':
+            self.df = pd.read_csv(self.path)
+            self.limit = min(self.limit, len(self.df))
+            print("Loaded " + str(self.limit) + " Features.")
         else:
             print("Use Tshark to listen the packet")
             self.tshark = pyshark.LiveCapture(interface='wlo1')
@@ -229,6 +236,22 @@ class FE:
                 }
 
                 return self.nstat.updateGetStats(ip_proto, src_mac, dst_mac, src_ip, src_port, dst_ip, dst_port, packet_length, float(timestamp)), data_dict
+            elif self.type == 'csv':
+                feature = self.df.iloc[self.curPacketIndx]
+                self.curPacketIndx+=1
+                data_dict = {
+                    "ip_protocol": "csv_data",
+                    "source_mac": None,
+                    "destination_mac": None,
+                    "source_ip": None,
+                    "source_port": None,
+                    "destination_ip": None,
+                    "destination_port": None,
+                    "data_length": None,
+                    "timestamp": time.time(),
+                }
+
+                return feature, data_dict
         except Exception as e:
             print(e)
             traceback.print_exc()

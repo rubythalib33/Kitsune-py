@@ -6,3 +6,5 @@ scipy
 pymongo
 matplotlib
 cython
+streamlit
+pandas

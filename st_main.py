@@ -79,10 +79,8 @@ if menu == "Kitsune Engine":
             if rmse == -1 or i > K.limit:
                 break
             data['path'] = path
-            result = collection.insert_one(data)
+            # result = collection.insert_one(data)
             RMSEs.append(rmse)
-            # Push data to MongoDB
-            # collection.insert_one({"timestamp": time.time(), "rmse": rmse})
         stop = time.time()
         print("Complete. Time elapsed: " + str(stop - start))
 
