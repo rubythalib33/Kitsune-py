@@ -12,7 +12,6 @@ if use_extrapolation:
 import netStat as ns
 import csv
 import numpy as np
-print("Importing Scapy Library")
 import pcapy
 import dpkt
 import os.path
